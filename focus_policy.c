@@ -161,7 +161,7 @@ int32s	search_global(void)
 	LOG_DBG("-----Lpf PeakPos=%d, Hpf PeakPos=%d\n", lpf_peak_pos, hpf_peak_pos);
 
 
-	focus_pos=focus_peak_pos + 3*focus_step;
+	focus_pos=focus_peak_pos + 1.5*focus_step;
 	
 
 	if(focus_pos < focus_lpos)
@@ -202,7 +202,7 @@ int32s	search_global(void)
 		//取马达停止后的值
 		curr_lpf[0]=get_win_lpf(win_idx);
 
-		LOG_DBG("SP---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
+		printf("focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
 
 
 		//统计值下降
@@ -218,7 +218,7 @@ int32s	search_global(void)
 			printf("-------focus_step = %d--------\r\n", focus_step);
 			ptz_init_focus();
 			ptz_init_focus();
-			LOG_DBG("-------focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
+			printf("-------focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
 
 		}
 
@@ -230,10 +230,9 @@ int32s	search_global(void)
 			drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
-			LOG_DBG("------------down_cnt>=3----------\r\n");
-			LOG_DBG("-------peak=%d-------\r\n", lens_get_focus_cur_pos());
-			LOG_DBG("------zhs---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
-			LOG_DBG("----------------------\r\n");
+			printf("------------down_cnt>=3----------\r\n");
+			printf("------zhs---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
+			printf("----------------------\r\n");
 			break;
 		}
 
