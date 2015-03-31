@@ -72,7 +72,8 @@ int32s	search_global(void)
 	{
 		focus_lpos=lens_get_focus_coord_min();
 	}
-	
+	focus_hpos=lens_get_focus_coord_max();
+	focus_lpos=lens_get_focus_coord_min();
 	LOG_DBG("SP---zoom_pos=%d, Cur_Focus[%d] Focus Range[%d    %d]\r\n", zoom_pos,focus_pos, focus_lpos, focus_hpos);
 	
 	//最小步长驱动focus
