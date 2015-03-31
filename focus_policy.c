@@ -1,7 +1,7 @@
 #include "focus_in.h"
 #include "sys_log.h"
 
-#define SEARCH_RANGE 1000
+#define SEARCH_RANGE 3432
 
 int32s	search_global(void)
 {
@@ -72,8 +72,6 @@ int32s	search_global(void)
 	{
 		focus_lpos=lens_get_focus_coord_min();
 	}
-	focus_hpos=lens_get_focus_coord_max();
-	focus_lpos=lens_get_focus_coord_min();
 	LOG_DBG("SP---zoom_pos=%d, Cur_Focus[%d] Focus Range[%d    %d]\r\n", zoom_pos,focus_pos, focus_lpos, focus_hpos);
 	
 	//最小步长驱动focus
@@ -99,7 +97,7 @@ int32s	search_global(void)
 	LOG_DBG("lens_set_focus_dir(LENS_FOCUS_FAR)\n");
 
 	//设置马达步长
-	focus_step = 8;
+	focus_step = 52;
 	
 	lens_set_focus_step(focus_step);
 	LOG_DBG("lens_set_focus_step(focus_step:%d)\n",focus_step);
@@ -122,6 +120,7 @@ int32s	search_global(void)
 		{
 			
 		}
+		//检测画面变化
 		if(motion_detect_all(motion_th, 500)==MOTION_DETECT)
 		{
 			
@@ -188,6 +187,8 @@ int32s	search_global(void)
 	prev_lpf[0]=get_win_lpf(win_idx);
 	down_cnt=0;
 	
+	printf("------------start accurate search ---------\r\n");
+	
 	for(i=0;i<60;i++)
 	{
 	
@@ -210,10 +211,10 @@ int32s	search_global(void)
 			down_cnt++;
 			//反转马达
 			lens_reverse_focus_dir();
-			printf("-------zhs-------reverse motor---------\r\n");
+			printf("------------reverse motor---------\r\n");
 			ptz_init_focus();
 			ptz_init_focus();
-			LOG_DBG("------zhs---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
+			LOG_DBG("-------focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
 
 		}
 
@@ -225,7 +226,7 @@ int32s	search_global(void)
 			drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
-			LOG_DBG("----------------------\r\n");
+			LOG_DBG("------------down_cnt>=3----------\r\n");
 			LOG_DBG("-------peak=%d-------\r\n", lens_get_focus_cur_pos());
 			LOG_DBG("------zhs---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
 			LOG_DBG("----------------------\r\n");
