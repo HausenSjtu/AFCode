@@ -180,7 +180,7 @@ int32s	search_global(void)
 	}
 
 		//设置搜索步长
-	focus_step=4;
+	focus_step= focus_step / 2;
 	lens_set_focus_step(focus_step);
 	drive_filter_update(MOTOR_STOP);
 
@@ -211,7 +211,11 @@ int32s	search_global(void)
 			down_cnt++;
 			//反转马达
 			lens_reverse_focus_dir();
+			//重新设置步长
+			focus_step= focus_step / 2;
+			lens_set_focus_step(focus_step);
 			printf("------------reverse motor---------\r\n");
+			printf("-------focus_step = %d--------\r\n", focus_step);
 			ptz_init_focus();
 			ptz_init_focus();
 			LOG_DBG("-------focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
