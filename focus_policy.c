@@ -161,7 +161,7 @@ int32s	search_global(void)
 	LOG_DBG("-----Lpf PeakPos=%d, Hpf PeakPos=%d\n", lpf_peak_pos, hpf_peak_pos);
 
 
-	focus_pos=focus_peak_pos + 1.5*focus_step;
+	focus_pos=focus_peak_pos + focus_step;
 	
 
 	if(focus_pos < focus_lpos)
