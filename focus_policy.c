@@ -97,7 +97,7 @@ int32s	search_global(void)
 	LOG_DBG("lens_set_focus_dir(LENS_FOCUS_FAR)\n");
 
 	//设置马达步长
-	focus_step = 52;
+	focus_step = 104;
 	
 	lens_set_focus_step(focus_step);
 	LOG_DBG("lens_set_focus_step(focus_step:%d)\n",focus_step);
