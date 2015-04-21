@@ -14,7 +14,7 @@ int32s	search_global(void)
 
 	int32s	lpf_peak;
 	int32s	lpf_valley;
-	
+
 	int32s	lpf_peak_pos;
 	int32s	hpf_peak_pos;
 	int32s	focus_pos;
