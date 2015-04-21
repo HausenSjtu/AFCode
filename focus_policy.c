@@ -269,7 +269,7 @@ int32s	search_global(void)
 	LOG_DBG("-----Lpf PeakPos=%d, Hpf PeakPos=%d\n", lpf_peak_pos, hpf_peak_pos);
 
 
-	focus_pos=focus_peak_pos + 0.5 * focus_step;
+	focus_pos=focus_peak_pos + focus_step;
 	
 
 	if(focus_pos < focus_lpos)
@@ -288,8 +288,8 @@ int32s	search_global(void)
 	}
 
 		//设置搜索步长
-	//focus_step= focus_step;
-	//lens_set_focus_step(focus_step);
+	focus_step= focus_step / 2;
+	lens_set_focus_step(focus_step);
 	drive_filter_update(MOTOR_STOP);
 
 	prev_lpf[0]=get_win_lpf(win_idx);
@@ -330,7 +330,7 @@ int32s	search_global(void)
 
 		}
 
-		if(down_cnt>=4)
+		if(down_cnt>=3)
 		{
 			//返回清晰点
 			drive_filter_update(MOTOR_RUN);
