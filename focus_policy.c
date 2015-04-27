@@ -2,6 +2,7 @@
 #include "sys_log.h"
 
 #define SEARCH_RANGE 3432
+#define SEARCH_RANGE_SMALL 52
 
 int32s	search_global(void)
 {
@@ -60,8 +61,8 @@ int32s	search_global(void)
 	zoom_pos=lens_get_zoom_cur_pos();
 	focus_pos=lens_get_focus_cur_pos();
 	
-	focus_hpos	=focus_pos+SEARCH_RANGE;
-	focus_lpos	=focus_pos-SEARCH_RANGE;
+	focus_hpos	=focus_pos+SEARCH_RANGE_SMALL;
+	focus_lpos	=focus_pos-SEARCH_RANGE_SMALL;
 
 	if(focus_hpos>lens_get_focus_coord_max())
 	{
@@ -222,7 +223,7 @@ int32s	search_global(void)
 
 		}
 
-		if(down_cnt>=4)
+		if(down_cnt>=1)
 		{
 			//返回清晰点
 			drive_filter_update(MOTOR_RUN);
@@ -230,7 +231,7 @@ int32s	search_global(void)
 			drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
-			printf("------------down_cnt>=3----------\r\n");
+			printf("------------down_cnt>=1----------\r\n");
 			printf("------zhs---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
 			printf("----------------------\r\n");
 			break;
