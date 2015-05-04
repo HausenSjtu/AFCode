@@ -19,6 +19,7 @@ int32s	search_global(void)
 	int32s	hpf_peak_pos;
 	int32s	focus_pos;
 	int32s	focus_peak_pos;
+	int32s  zhs_initial_focus_pos;
 	
 	int32s 	zoom_pos;
 	int32s	focus_lpos;
@@ -54,14 +55,13 @@ int32s	search_global(void)
 	LOG_DBG("***********************START SEARCH_CLIMB_SIMPLE*************************************\r\n");
 	
 	printf("-------lens_get_focus_coord_max------- %d---------\r\n",lens_get_focus_coord_max());
-	printf("-------lens_get_focus_coord_min------- %d---------\r\n",lens_get_focus_coord_min());
-	printf("\n\nzhs_pre_focus_pos:%d\nzhs_mark_have_done:%d\nzhs_pre_lpf:%d\n\r\n",zhs_pre_focus_pos,zhs_mark_have_done,zhs_pre_lpf);		
+	printf("-------lens_get_focus_coord_min------- %d---------\r\n",lens_get_focus_coord_min());		
 		
 	zoom_pos=lens_get_zoom_cur_pos();
-//	focus_pos=lens_get_focus_cur_pos();
+	zhs_initial_focus_pos=lens_get_focus_cur_pos();
 
 	if (zhs_mark_have_done){
-		focus_pos = zhs_pre_focus_pos;
+		focus_pos = zhs_initial_focus_pos + pre_d_focus_pos;
 		focus_hpos	=focus_pos+SEARCH_RANGE_SMALL;
 		focus_lpos	=focus_pos-SEARCH_RANGE_SMALL;
 		printf("-------SEARCH_RANGE------- %d---------\r\n",SEARCH_RANGE_SMALL);
@@ -341,9 +341,11 @@ int32s	search_global(void)
 			printf("------------down_cnt>=3----------\r\n");
 			printf("------zhs---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
 			printf("----------------------\r\n");
-			zhs_pre_focus_pos= lens_get_focus_cur_pos();
+//			zhs_pre_focus_pos= lens_get_focus_cur_pos();
 			zhs_mark_have_done = TRUE;
 			zhs_pre_lpf = curr_lpf[0];
+			pre_zoom_pos = zoom_pos;
+			pre_d_focus_pos = lens_get_focus_cur_pos() - zhs_initial_focus_pos;
 			break;
 		}
 

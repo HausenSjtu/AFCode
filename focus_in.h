@@ -569,8 +569,10 @@ FOCUS_IN_EXT	volatile int8u  af_info_rdstatus;
 *							zhs test how can it store the data
 *
 ****************************************************************************************/
-int32u zhs_pre_focus_pos = 0 ;
+//int32s zhs_pre_focus_pos = 0;
 int32s zhs_pre_lpf = 0;
+int32s pre_zoom_pos = 0;
+int32s pre_d_focus_pos = 0;
 Bool zhs_mark_have_done = FALSE;
 
 
