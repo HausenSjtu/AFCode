@@ -65,6 +65,7 @@ int32s	search_global(void)
 		focus_hpos	=focus_pos+SEARCH_RANGE_SMALL;
 		focus_lpos	=focus_pos-SEARCH_RANGE_SMALL;
 		printf("-------SEARCH_RANGE------- %d---------\r\n",SEARCH_RANGE_SMALL);
+		printf("-------pre_d_focus_pos------- %d---------\r\n",pre_d_focus_pos);
 	}
 	else{
 		focus_pos = lens_get_focus_cur_pos();
