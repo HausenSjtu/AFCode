@@ -2,7 +2,8 @@
 #include "sys_log.h"
 
 #define SEARCH_RANGE 3432
-#define SEARCH_RANGE_SMALL 520
+#define SEARCH_RANGE_SMALL 52
+#define MAX_STEP 52
 
 int32s	search_global(void)
 {
@@ -14,12 +15,11 @@ int32s	search_global(void)
 
 	int32s	lpf_peak;
 	int32s	lpf_valley;
-
+	
 	int32s	lpf_peak_pos;
 	int32s	hpf_peak_pos;
 	int32s	focus_pos;
 	int32s	focus_peak_pos;
-	int32s  zhs_initial_focus_pos;
 	
 	int32s 	zoom_pos;
 	int32s	focus_lpos;
@@ -54,27 +54,16 @@ int32s	search_global(void)
 	
 	LOG_DBG("***********************START SEARCH_CLIMB_SIMPLE*************************************\r\n");
 	
+	printf("-------SEARCH_RANGE------- %d---------\r\n",SEARCH_RANGE);
 	printf("-------lens_get_focus_coord_max------- %d---------\r\n",lens_get_focus_coord_max());
-	printf("-------lens_get_focus_coord_min------- %d---------\r\n",lens_get_focus_coord_min());		
+	printf("-------lens_get_focus_coord_min------- %d---------\r\n",lens_get_focus_coord_min());
+			
 		
 	zoom_pos=lens_get_zoom_cur_pos();
-	zhs_initial_focus_pos=lens_get_focus_cur_pos();
-
-	if (zhs_mark_have_done){
-		focus_pos = zhs_initial_focus_pos + pre_d_focus_pos;
-		focus_hpos	=focus_pos+SEARCH_RANGE_SMALL;
-		focus_lpos	=focus_pos-SEARCH_RANGE_SMALL;
-		printf("-------SEARCH_RANGE------- %d---------\r\n",SEARCH_RANGE_SMALL);
-		printf("-------pre_d_focus_pos------- %d---------\r\n",pre_d_focus_pos);
-	}
-	else{
-		focus_pos = lens_get_focus_cur_pos();
-		focus_hpos	=focus_pos+SEARCH_RANGE;
-		focus_lpos	=focus_pos-SEARCH_RANGE;
-		printf("-------SEARCH_RANGE------- %d---------\r\n",SEARCH_RANGE);
-	}
-
+	focus_pos=lens_get_focus_cur_pos();
 	
+	focus_hpos	=focus_pos+SEARCH_RANGE;
+	focus_lpos	=focus_pos-SEARCH_RANGE;
 
 	if(focus_hpos>lens_get_focus_coord_max())
 	{
@@ -110,7 +99,7 @@ int32s	search_global(void)
 	LOG_DBG("lens_set_focus_dir(LENS_FOCUS_FAR)\n");
 
 	//设置马达步长
-	focus_step = 52;
+	focus_step = 2;
 	
 	lens_set_focus_step(focus_step);
 	LOG_DBG("lens_set_focus_step(focus_step:%d)\n",focus_step);
@@ -128,6 +117,12 @@ int32s	search_global(void)
 
 	for(i=focus_hpos; i>=focus_lpos; i-=focus_step)
 	{
+		//raise the step slowly
+		focus_step = (2*focus_step)>MAX_STEP?MAX_STEP:(2*focus_step);
+		lens_set_focus_step(focus_step);
+		LOG_DBG("lens_set_focus_step(focus_step:%d)\n",focus_step);
+
+
 		//驱动马达一次
 		if(drive_filter_update(MOTOR_RUN)==SEARCH_RESTART)
 		{
@@ -154,102 +149,6 @@ int32s	search_global(void)
 		
 	}
 	
-	printf("\n\n\n\nget_win_lpf(win_idx)=%d;zhs_pre_lpf=%d\r\n\n\n",get_lpf_peak(win_idx),zhs_pre_lpf);
-
-// new start
-
-	if (get_lpf_peak(win_idx)<0.7*zhs_pre_lpf){
-		printf("~~~~~~~~~~~ oh no, I may calculate it again for a long time ~~~~~~~~\r\n");
-		focus_pos = lens_get_focus_cur_pos();
-		focus_hpos	=focus_pos+SEARCH_RANGE;
-		focus_lpos	=focus_pos-SEARCH_RANGE;
-		printf("-------SEARCH_RANGE------- %d---------\r\n",SEARCH_RANGE);
-
-
-		
-
-		if(focus_hpos>lens_get_focus_coord_max())
-		{
-			focus_hpos=lens_get_focus_coord_max();
-		}
-
-		if(focus_lpos<lens_get_focus_coord_min())
-		{
-			focus_lpos=lens_get_focus_coord_min();
-		}
-		LOG_DBG("SP---zoom_pos=%d, Cur_Focus[%d] Focus Range[%d    %d]\r\n", zoom_pos,focus_pos, focus_lpos, focus_hpos);
-
-
-		
-		
-		
-
-		//移动focus到上限
-		focus_pos_arrive(52, focus_hpos);
-		LOG_DBG("focus_pos_arrive to high pos:%d\n",focus_hpos);
-		
-	//	OSTimeDly(200);
-		
-		LOG_DBG("focus_pos_arrive cur pos:%d\n",lens_get_focus_cur_pos());
-		
-		//设置马达方向
-		lens_set_focus_dir(LENS_FOCUS_FAR);
-		LOG_DBG("lens_set_focus_dir(LENS_FOCUS_FAR)\n");
-		
-		motion_th=1000;
-
-		//跟踪矩阵初始化
-		filter_statistic_init();
-		LOG_DBG("filter_statistic_init\n");
-		
-		if(drive_filter_update(MOTOR_STOP)==SEARCH_RESTART)
-		{
-		
-		}
-
-		for(i=focus_hpos; i>=focus_lpos; i-=focus_step)
-		{
-			//驱动马达一次
-			if(drive_filter_update(MOTOR_RUN)==SEARCH_RESTART)
-			{
-				
-			}
-			//检测画面变化
-			if(motion_detect_all(motion_th, 500)==MOTION_DETECT)
-			{
-				
-			}
-			prev_lpf[0]=get_prev_lpf(win_idx);
-			prev_hpf[0]=get_prev_hpf(win_idx);
-
-			
-			curr_lpf[0]=get_win_lpf(win_idx);
-			curr_hpf[0]=get_win_hpf(win_idx);	
-
-			//计算增长率
-			lpf_ratio = compute_krate_s(curr_lpf[0], prev_lpf[0]);
-			hpf_ratio = compute_krate_s(curr_hpf[0], prev_hpf[0]);
-
-			LOG_DBG("Fpos=%d, cur_lpf=%d, prev_lpf=%d, cur_hpf=%d, prev_hpf=%d, h_ratio=%d, l_ratio=%d\n", \
-				lens_get_focus_cur_pos(), curr_lpf[0], prev_lpf[0], curr_hpf[0], prev_hpf[0],hpf_ratio, lpf_ratio);
-			
-		}
-
-		
-	}
-
-
-
-
-
-
-
-
-// new end
-
-
-
-	
 	//win_idx=3;
 	lpf_peak_pos=get_lpf_peak_pos(win_idx);
 	hpf_peak_pos=get_hpf_peak_pos(win_idx);
@@ -270,7 +169,7 @@ int32s	search_global(void)
 	LOG_DBG("-----Lpf PeakPos=%d, Hpf PeakPos=%d\n", lpf_peak_pos, hpf_peak_pos);
 
 
-	focus_pos=focus_peak_pos + focus_step;
+	focus_pos=focus_peak_pos + 0.5 * focus_step;
 	
 
 	if(focus_pos < focus_lpos)
@@ -289,8 +188,8 @@ int32s	search_global(void)
 	}
 
 		//设置搜索步长
-	focus_step= focus_step / 2;
-	lens_set_focus_step(focus_step);
+	//focus_step= focus_step;
+	//lens_set_focus_step(focus_step);
 	drive_filter_update(MOTOR_STOP);
 
 	prev_lpf[0]=get_win_lpf(win_idx);
@@ -331,7 +230,7 @@ int32s	search_global(void)
 
 		}
 
-		if(down_cnt>=3)
+		if(down_cnt>=1)
 		{
 			//返回清晰点
 			drive_filter_update(MOTOR_RUN);
@@ -339,14 +238,20 @@ int32s	search_global(void)
 			drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
-			printf("------------down_cnt>=3----------\r\n");
+			printf("------------down_cnt>=1----------\r\n");
 			printf("------zhs---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
 			printf("----------------------\r\n");
-//			zhs_pre_focus_pos= lens_get_focus_cur_pos();
-			zhs_mark_have_done = TRUE;
-			zhs_pre_lpf = curr_lpf[0];
-			pre_zoom_pos = zoom_pos;
-			pre_d_focus_pos = lens_get_focus_cur_pos() - zhs_initial_focus_pos;
+
+			
+			LOG_TRACE("======zhsTest===zoom_pos=%d=foucs_pos=%d-----\r\n",lens_get_zoom_cur_pos(), lens_get_focus_cur_pos());
+			FILE *fp;
+			fp = fopen("/mnt/ramdisk/test.txt","a+");
+			if (fp==NULL)
+				printf("file open failed~");
+			else{
+				fprintf(fp,"zoom_pos=%d\tfocus_pos=%d\n",lens_get_zoom_cur_pos(),lens_get_focus_cur_pos());
+				fclose(fp);
+			}
 			break;
 		}
 
