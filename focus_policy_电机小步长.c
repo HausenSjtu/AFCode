@@ -1,8 +1,9 @@
 #include "focus_in.h"
 #include "sys_log.h"
 
-#define SEARCH_RANGE 3432
+#define SEARCH_RANGE 858
 #define SEARCH_RANGE_SMALL 52
+#define MAX_STEP 13
 
 int32s	search_global(void)
 {
@@ -98,7 +99,7 @@ int32s	search_global(void)
 	LOG_DBG("lens_set_focus_dir(LENS_FOCUS_FAR)\n");
 
 	//设置马达步长
-	focus_step = 52;
+	focus_step = 2;
 	
 	lens_set_focus_step(focus_step);
 	LOG_DBG("lens_set_focus_step(focus_step:%d)\n",focus_step);
@@ -116,6 +117,12 @@ int32s	search_global(void)
 
 	for(i=focus_hpos; i>=focus_lpos; i-=focus_step)
 	{
+		//raise the step slowly
+		focus_step = (2*focus_step)>MAX_STEP?MAX_STEP:(2*focus_step);
+		lens_set_focus_step(focus_step);
+		LOG_DBG("lens_set_focus_step(focus_step:%d)\n",focus_step);
+
+
 		//驱动马达一次
 		if(drive_filter_update(MOTOR_RUN)==SEARCH_RESTART)
 		{
