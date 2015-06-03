@@ -231,7 +231,7 @@ int32s	search_global(void)
 			drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
 			//drive_filter_update(MOTOR_STOP);
-			printf("------------down_cnt>=1----------\r\n");
+			printf("------------down_cnt>=4----------\r\n");
 			printf("------zhs---focus pos=%d, cur_lpf=%d pre_lpf=%d\r\n",lens_get_focus_cur_pos(),curr_lpf[0],prev_lpf[0]);
 			printf("----------------------\r\n");
 
